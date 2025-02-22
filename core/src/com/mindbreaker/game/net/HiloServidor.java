@@ -63,7 +63,7 @@ public class HiloServidor extends Thread {
 				enviarMensaje("Ok", clientes[cantClientes].getIp(), clientes[cantClientes].getPuerto());
 			} else if (cantClientes == 2) {
 				for (int i = 0; i < clientes.length; i++) {
-					// enviarMensaje("Empieza", clientes[i].getIp(), clientes);
+					enviarMensaje("Empieza", clientes[i].getIp(), clientes[cantClientes].getPuerto());
 				}
 			}
 		}
