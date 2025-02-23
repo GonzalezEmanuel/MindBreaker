@@ -8,5 +8,4 @@ public abstract class Globales {
 	public static boolean esServer;
 	public static boolean reproducirMusica = false;
 	
-	
 }
