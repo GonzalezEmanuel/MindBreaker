@@ -1,3 +1,4 @@
+
 package com.mindbreaker.game.net;
 
 import java.io.IOException;
@@ -7,19 +8,21 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import com.mindbreaker.game.utiles.Globales;
+
 public class HiloCliente extends Thread {
 	
 	private DatagramSocket conexion;
 	private InetAddress ipServer;
-	private int puerto = 91218;
+	private int puerto = 9998;
 	private boolean fin = false;
 	
 	public HiloCliente() {
 		
 		
 		try {
-			ipServer = InetAddress.getByName("255.255.255.");
-			conexion = new DatagramSocket(91218);
+			ipServer = InetAddress.getByName("255.255.255.255");
+			conexion = new DatagramSocket();
 		} catch (SocketException | UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -31,6 +34,7 @@ public class HiloCliente extends Thread {
 		DatagramPacket dp = new DatagramPacket(data, data.length, ipServer, puerto);
 		
 		try {
+			System.out.println("Enviando mensaje " + msg + " ip " + ipServer + " puerto " + puerto);
 			conexion.send(dp);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -56,10 +60,12 @@ public class HiloCliente extends Thread {
 	}
 
 	private void procesarMensaje(DatagramPacket dp) {
-		String msg = dp.getData().toString().trim();
+		String msg = (new String(dp.getData())).trim();
 		
 		if (msg.equals("Ok")) {
 			ipServer = dp.getAddress();
+		} else if (msg.equals("Empieza")) {
+			Globales.empieza = true;
 		}
 	}
 	

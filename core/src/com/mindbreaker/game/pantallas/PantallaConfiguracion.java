@@ -24,8 +24,8 @@ public class PantallaConfiguracion implements Screen {
 
 	Imagen fondo;
 	SpriteBatch b;
-	Texto opciones[] = new Texto[5];
-	String textos[] = new String[5];
+	Texto opciones[] = new Texto[4];
+	String textos[] = new String[4];
 	int opc = 1;
 	ShapeRenderer sr;
 	float tiempo = 0;
@@ -53,8 +53,7 @@ public class PantallaConfiguracion implements Screen {
 		textos[0] = "Resolución: " + Config.ANCHO + " x " + Config.ALTO;
 		textos[1] = "Pantalla Completa: Desactivada";
 		textos[2] = "Volumen: " + (int) (Config.getVolumen() * 100) + "%";
-		textos[3] = "Fps: " + Config.getFps();
-		textos[4] = "Volver al menú";
+		textos[3] = "Volver al menú";
 		
 		 
 		
@@ -93,18 +92,18 @@ public class PantallaConfiguracion implements Screen {
 		b.end();
 
 		b.setProjectionMatrix(c.combined);
-	    sr.setProjectionMatrix(c.combined);
-		
-		sr.begin(ShapeType.Line);
-
-		sr.setColor(Color.WHITE);
-		for (int i = 0; i < opciones.length; i++) {
-			sr.rect(opciones[i].getX(), opciones[i].getY() - opciones[i].getAlto(), opciones[i].getAncho(),
-					opciones[i].getAlto());
-
-		}
-
-		sr.end();
+//	    sr.setProjectionMatrix(c.combined);
+//		
+//		sr.begin(ShapeType.Line);
+//
+//		sr.setColor(Color.WHITE);
+//		for (int i = 0; i < opciones.length; i++) {
+//			sr.rect(opciones[i].getX(), opciones[i].getY() - opciones[i].getAlto(), opciones[i].getAncho(),
+//					opciones[i].getAlto());
+//
+//		}
+//
+//		sr.end();
 
 		tiempo += delta;
 
@@ -178,22 +177,11 @@ public class PantallaConfiguracion implements Screen {
 				ManagerMusica.getCurrentMusic().setVolume(Config.getVolumen());
 				opciones[2].setTexto("Volumen: " + (int) (Config.getVolumen() * 100) + "%");
 
-			} else if (opc == 4) {
-
-				if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-					Config.setFps(74);
-
-					if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-						Config.setFps(60);
-					}
-
-				}
-				opciones[3].setTexto("Fps: " + Config.getFps());
-			}
+			} 
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
-			if (opc == 5) {
+			if (opc == 4) {
 				Render.app.setScreen(new PantallaMenu());
 			}
 

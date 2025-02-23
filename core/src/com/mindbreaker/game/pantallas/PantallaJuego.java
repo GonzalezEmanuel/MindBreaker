@@ -45,8 +45,8 @@ public class PantallaJuego implements Screen {
 		c.position.set(c.viewportWidth / 2, c.viewportHeight / 2, 0);
 		c.update();
 		
-		b = new SpriteBatch();
-		
+		b = Render.batch;
+
 		
 		texturaJugador = new Texture(Recursos.SPRITEJUGADOR);
 		texturaObstaculo = new Texture(Recursos.SPRITEOBSTACULO);
@@ -78,6 +78,7 @@ public class PantallaJuego implements Screen {
 	
 	@Override
 	public void render(float delta) {
+		
 		Render.limpiarPantalla(0, 0, 0);
 		
 		v.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
@@ -90,7 +91,7 @@ public class PantallaJuego implements Screen {
 		b.setProjectionMatrix(c.combined);
 		sr.setProjectionMatrix(c.combined);
 		
-	
+		
 		
 		sr.begin(ShapeRenderer.ShapeType.Filled);
 		sr.setColor(Color.GREEN);

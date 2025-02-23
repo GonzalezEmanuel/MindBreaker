@@ -27,7 +27,6 @@ public class PantallaMenu implements Screen {
 	ShapeRenderer sr;
 	OrthographicCamera c;
 	Viewport v;
-	
 
 
 	
@@ -85,6 +84,16 @@ public class PantallaMenu implements Screen {
 		
 		sr.end();
 		
+		
+	   
+	    
+	    float mouseX = Gdx.input.getX();
+	    float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); 	    
+	    
+	    
+	    
+	    
+		
 		tiempo += delta;
 		
 		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
@@ -119,10 +128,25 @@ public class PantallaMenu implements Screen {
 			
 		}
 		
+		 
+//		for (int i = 0; i < opciones.length; i++) {
+//	     
+//	        if (mouseX >= opciones[i].getX() && mouseX <= opciones[i].getX() + opciones[i].getAncho() &&
+//	            mouseY >= opciones[i].getY() - opciones[i].getAlto() && mouseY <= opciones[i].getY()) {
+//	            opciones[i].setColor(Color.YELLOW); 
+//	        } else {
+//	            opciones[i].setColor(Color.WHITE);
+//	        }
+//
+//	    }
+		
+		
 		if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
 			if (opc == 1) {
 				Render.app.setScreen(new PantallaJuego());
 				
+			}  else if (opc ==2) {
+				Render.app.setScreen(new PantallaJuegoMultijugador());
 			}  else if (opc == 3) {
 				Render.app.setScreen(new PantallaConfiguracion());
 			}  else if (opc == 4) {
@@ -141,10 +165,7 @@ public class PantallaMenu implements Screen {
 		c.position.set(c.viewportWidth / 2, c.viewportHeight / 2, 0);
 		c.update();
 		
-		for (int i = 0; i < opciones.length; i++) {
-			opciones[i].setPosition((width / 2) - (opciones[i].getAncho() / 2),
-					(height / 2) + (opciones[0].getAlto() / 2) - (opciones[i].getAlto() + (60 * i)));
-		}
+	
 	}
 
 

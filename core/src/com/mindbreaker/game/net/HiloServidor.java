@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
+import com.mindbreaker.game.utiles.Globales;
+
 public class HiloServidor extends Thread {
 	
 	private DatagramSocket conexion;
@@ -18,7 +20,7 @@ public class HiloServidor extends Thread {
 		
 		try {
 			
-			conexion = new DatagramSocket(91218);
+			conexion = new DatagramSocket(9998);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -55,16 +57,21 @@ public class HiloServidor extends Thread {
 	}
 
 	private void procesarMensaje(DatagramPacket dp) {
-		String msg = dp.getData().toString().trim();
+		String msg = (new String(dp.getData())).trim();
+		System.out.println("Mensaje = " + msg);
 		
 		if (msg.equals("Conexion")) {
+			System.out.println("Llega msg conexion cliente " + cantClientes);
 			if (cantClientes < 2) {
-				clientes[cantClientes++] = new DireccionRed(dp.getAddress(), dp.getPort());
-				enviarMensaje("Ok", clientes[cantClientes].getIp(), clientes[cantClientes].getPuerto());
+				clientes[cantClientes] = new DireccionRed(dp.getAddress(), dp.getPort());
+				enviarMensaje("Ok", clientes[cantClientes].getIp(), clientes[cantClientes++].getPuerto());
 			} else if (cantClientes == 2) {
+				Globales.empieza = true;
 				for (int i = 0; i < clientes.length; i++) {
-					// Prueba nueva de git 2
-					enviarMensaje("Empieza", clientes[i].getIp(), clientes[cantClientes].getPuerto());
+					
+					enviarMensaje("Empieza", clientes[i].getIp(), clientes[i].getPuerto());
+					 
+					
 				}
 			}
 		}
