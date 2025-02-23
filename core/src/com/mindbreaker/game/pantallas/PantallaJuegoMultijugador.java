@@ -16,6 +16,7 @@ import com.mindbreaker.game.elementos.Moneda;
 import com.mindbreaker.game.elementos.Nivel;
 import com.mindbreaker.game.elementos.Obstaculo;
 import com.mindbreaker.game.elementos.Texto;
+import com.mindbreaker.game.io.KeyListener;
 import com.mindbreaker.game.net.HiloCliente;
 import com.mindbreaker.game.net.HiloServidor;
 import com.mindbreaker.game.utiles.Config;
@@ -27,7 +28,8 @@ public class PantallaJuegoMultijugador implements Screen {
 
 	private OrthographicCamera c;
 	private SpriteBatch b;
-	private Rectangle jugador;
+	private Rectangle j1;
+	private Rectangle j2;
 	private Texture texturaJugador;
 	private Texture texturaObstaculo;
 	private Texture texturaMoneda;
@@ -39,6 +41,8 @@ public class PantallaJuegoMultijugador implements Screen {
     private Texto espera;
     private HiloCliente hc;
     private HiloServidor hs;
+    private KeyListener teclas;
+    public boolean isUp1 = false, isDown1 = false, isUp2 = false, isDown2 = false;
     
 	@Override
 	public void show() {
@@ -48,6 +52,8 @@ public class PantallaJuegoMultijugador implements Screen {
 		v = new FitViewport(Config.ANCHO, Config.ALTO, c);
 		c.position.set(c.viewportWidth / 2, c.viewportHeight / 2, 0);
 		c.update();
+		
+		teclas = new KeyListener(hc);
 		
 		b = Render.batch;
 		
@@ -73,15 +79,21 @@ public class PantallaJuegoMultijugador implements Screen {
 		meta[5] = new Rectangle(1,1,1,1);
 		
 		
-		jugador = new Rectangle();
-		jugador.width = 35;
-		jugador.height = 35;
-		jugador.x = 175;
-		jugador.y = 550;
+		j1 = new Rectangle();
+		j1.width = 35;
+		j1.height = 35;
+		j1.x = 175;
+		j1.y = 550;
+		
+		j2 = new Rectangle();
+		j2.width = 35;
+		j2.height = 35;
+		j2.x = 175;
+		j2.y = 550;
 		
 		sr = new ShapeRenderer();
 		if (Globales.esServer) {
-			hs = new HiloServidor();
+			hs = new HiloServidor(this);
 			hs.start();
 		} else {
 			hc = new HiloCliente();
@@ -95,102 +107,96 @@ public class PantallaJuegoMultijugador implements Screen {
 		Render.limpiarPantalla(0, 0, 0);
 		
 		
-		
 		if (!Globales.empieza) {
 			b.begin();
 			espera.dibujar();
 			b.end();
 		} else {
-			
+
 			v.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-		    
-			
-		    c.position.set(c.viewportWidth / 2, c.viewportHeight / 2, 0);
-		    c.update();
-			
-			
+
+			c.position.set(c.viewportWidth / 2, c.viewportHeight / 2, 0);
+			c.update();
+
 			b.setProjectionMatrix(c.combined);
 			sr.setProjectionMatrix(c.combined);
-			
+
 			sr.begin(ShapeRenderer.ShapeType.Filled);
 			sr.setColor(Color.GREEN);
-			
+
 			switch (nivel) {
 			case 1:
 				sr.rect(100, 549, 174, 100);
 				sr.rect(1025, 70, 174, 100);
-			break;
+				break;
 			case 2:
 				sr.rect(100, 70, 174, 100);
 				sr.rect(1025, 70, 174, 100);
-			break;
+				break;
 			case 3:
 				sr.rect(100, 475, 175, 175);
 				sr.rect(1025, 70, 175, 175);
-			break;
+				break;
 			case 4:
 				sr.rect(100, 215, 175, 290);
 				sr.rect(1025, 215, 175, 290);
-			break;
+				break;
 			case 5:
 				sr.rect(100, 215, 175, 290);
 				sr.rect(1025, 215, 175, 290);
-			break;
+				break;
 			}
-		    
-		    sr.end();
+
+			sr.end();
 			b.begin();
-			
+
 			b.setColor(Color.RED);
-				
-			b.draw(texturaJugador, jugador.x, jugador.y, jugador.width, jugador.height);
-			
-			
+
+			b.draw(texturaJugador, j1.x, j1.y, j1.width, j1.height);
+
 			b.end();
-			
+
+			b.setColor(Color.ORANGE);
+
+			b.draw(texturaJugador, j2.x, j2.y, j2.width, j2.height);
+
+			b.end();
+
 			b.begin();
-			
+
 			b.setColor(Color.YELLOW);
-			
+
 			for (Moneda m : nivelActual.getMonedas()) {
 				b.draw(texturaMoneda, m.getRectangulo().x, m.getRectangulo().y, 35, 35);
 			}
-			
+
 			b.end();
-			
-			
+
 			b.begin();
-			
+
 			b.setColor(Color.BLUE);
-			
+
 			for (Obstaculo o : nivelActual.getObstaculos()) {
-				
+
 				b.draw(texturaObstaculo, o.getRectangulo().x, o.getRectangulo().y, 35, 35);
 			}
-			
-			b.end();
-			
-			
-			dibujarNivel();
-			
-		    
-			entradasJugador();
-		
 
-			
-			
-			
-		
+			b.end();
+			dibujarNivel();
+			entradasJugador(j1);
+			entradasJugador(j2);
+
 			if (nivelSuperado()) {
 				avanzarNivel();
-				spawnearJugador(nivel);
-				
+				spawnearJugador(nivel, j1);
+				spawnearJugador(nivel, j2);
+
 			}
-			
 			moverObstaculos(delta);
-			}
+
 		}
-		
+
+	}
 		
 	
 	private void moverObstaculos(float delta) {
@@ -261,38 +267,68 @@ public class PantallaJuegoMultijugador implements Screen {
 }
 
 
-private void entradasJugador() {
+private void entradasJugador(Rectangle j) {	
 	float velocidad = 200 * Gdx.graphics.getDeltaTime();
-    float nuevaX = jugador.x;
-    float nuevaY = jugador.y;
-
-    if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-        nuevaY += velocidad;
+    float nuevaX = j.x;
+    float nuevaY = j.y;
+    
+    if (Globales.esServer) {
+    	if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+    		nuevaY += velocidad;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+    		nuevaY -= velocidad;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            nuevaX -= velocidad;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            nuevaX += velocidad;
+        }
+    } else {
+    	if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+    		hc.enviarMensaje("Arriba");
+    		isUp1 = true;
+        } else {
+        	hc.enviarMensaje("No aprete arriba");
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+    		hc.enviarMensaje("Abajo");
+    		isDown1 = true;
+        } else {
+        	hc.enviarMensaje("No aprete abajo");
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            
+        }
     }
-    if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-        nuevaY -= velocidad;
-    }
-    if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-        nuevaX -= velocidad;
-    }
-    if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-        nuevaX += velocidad;
-    }
+    
     
     
     
    
-    if (!colisionaConPared(nuevaX, jugador.y)) {
-        jugador.x = nuevaX;
+    if (!colisionaConPared(nuevaX, j1.y)) {
+        j1.x = nuevaX;
     }
-    if (!colisionaConPared(jugador.x, nuevaY)) {
-        jugador.y = nuevaY;
+    if (!colisionaConPared(j1.x, nuevaY)) {
+        j1.y = nuevaY;
     }
     
-   
+    if (!colisionaConPared(nuevaX, j2.y)) {
+        j2.x = nuevaX;
+    }
+    if (!colisionaConPared(j2.x, nuevaY)) {
+        j2.y = nuevaY;
+    }
+    
+    
+    
     
     if (colisionaConObstaculo()) {
-    	spawnearJugador(nivel);
+    	spawnearJugador(nivel,j1);
     	
     }
 
@@ -300,9 +336,10 @@ private void entradasJugador() {
 	
     
        
-    jugador.x = MathUtils.clamp(jugador.x, 0, Config.ANCHO - jugador.width);
-    jugador.y = MathUtils.clamp(jugador.y, 0, Config.ALTO - jugador.height);
-	
+    j1.x = MathUtils.clamp(j1.x, 0, Config.ANCHO - j1.width);
+    j1.y = MathUtils.clamp(j1.y, 0, Config.ALTO - j1.height);
+    j2.x = MathUtils.clamp(j2.x, 0, Config.ANCHO - j2.width);
+    j2.y = MathUtils.clamp(j2.y, 0, Config.ALTO - j2.height);
 }
 
 
@@ -391,8 +428,8 @@ private void dibujarNivel() {
 
     private boolean nivelSuperado() {
 
-    	if (jugador.overlaps(meta[nivel]) && nivelActual.getMonedas().size == 0) {
-    		return jugador.overlaps(meta[nivel]);
+    	if (j1.overlaps(meta[nivel]) && nivelActual.getMonedas().size == 0) {
+    		return j1.overlaps(meta[nivel]);
 	    }
     	return false;
     }
@@ -409,7 +446,7 @@ private void dibujarNivel() {
   
 	
 	private boolean colisionaConPared(float x, float y) {
-	    Rectangle futuroJugador = new Rectangle(x, y, jugador.width, jugador.height);
+	    Rectangle futuroJugador = new Rectangle(x, y, j1.width, j1.height);
 	    for (Rectangle pared : nivelActual.getParedes()) {
 	        if (futuroJugador.overlaps(pared)) {
 	            return true; 
@@ -419,34 +456,34 @@ private void dibujarNivel() {
 	}
 
 
-	public void spawnearJugador(int nivel) {
+	public void spawnearJugador(int nivel, Rectangle j) {
 	    switch (nivel) {
 	        case 1:
-	            jugador.x = 175;
-	            jugador.y = 550;
+	            j.x = 175;
+	            j.y = 550;
 	            break;
 	        case 2:
-	            jugador.x = 175;
-	            jugador.y = 200;
+	            j.x = 175;
+	            j.y = 200;
 	            break;
 	        case 3:
-	        	jugador.x = 175;
-	        	jugador.y = 550;
+	        	j.x = 175;
+	        	j.y = 550;
 	        	break;
 	        case 4:
-	        	jugador.x = 170; 
-	        	jugador.y = 345;
+	        	j.x = 170; 
+	        	j.y = 345;
 	        	break;
 	        default:
-	            jugador.x = 175;
-	            jugador.y = 550;
+	            j.x = 175;
+	            j.y = 550;
 	            break;
 	    }
 	}
 	
 	private boolean colisionaConObstaculo() {
 		for (Obstaculo o : nivelActual.getObstaculos()) {
-			if (jugador.overlaps(o.getRectangulo())) {
+			if (j1.overlaps(o.getRectangulo())) {
 				return true; // para debug = false
 			}
 			
@@ -457,7 +494,7 @@ private void dibujarNivel() {
 	private void verificarColisionMonedas() {
 	    for (int i = nivelActual.getMonedas().size - 1; i >= 0; i--) {
 	        Moneda moneda = nivelActual.getMonedas().get(i);
-	        if (jugador.overlaps(moneda.getRectangulo())) {
+	        if (j1.overlaps(moneda.getRectangulo())) {
 	            nivelActual.getMonedas().removeIndex(i);
 	        }
 	      

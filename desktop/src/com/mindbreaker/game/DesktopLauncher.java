@@ -1,6 +1,6 @@
 package com.mindbreaker.game;
 
-import com.badlogic.gdx.Gdx;
+
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.mindbreaker.game.utiles.Config;
@@ -10,7 +10,7 @@ import com.mindbreaker.game.utiles.Globales;
 public class DesktopLauncher {
 	
 
-
+	
 	public static void main(String[] args) {
 		
 		Globales.esServer = false;
